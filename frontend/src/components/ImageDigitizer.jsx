@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import styles from './ImageDigitizer.module.css'
 
-const API = 'http://localhost:8000'
+const API = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 const RESOLUCIONES = [
   { label: '100 × 100', value: 100 },
