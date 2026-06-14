@@ -53,8 +53,8 @@ def apply_compression(img: Image.Image, quality: int) -> tuple[Image.Image, int]
 
 def compute_psnr(orig: Image.Image, proc: Image.Image) -> float:
     """Peak Signal-to-Noise Ratio entre imagen original y procesada."""
-    a = np.array(orig.convert("RGB"), dtype=np.float64)
-    b = np.array(proc.convert("RGB").resize(orig.size), dtype=np.float64)
+    a = np.array(orig.convert("RGB"), dtype=np.float32)
+    b = np.array(proc.convert("RGB").resize(orig.size), dtype=np.float32)
     mse = np.mean((a - b) ** 2)
     if mse == 0:
         return 100.0
@@ -104,6 +104,8 @@ async def procesar_imagen(
         original = Image.open(io.BytesIO(data)).convert("RGB")
         original.verify()  # verifica integridad
         original = Image.open(io.BytesIO(data)).convert("RGB")  # reabrir tras verify
+        # OPTIMIZACIÓN: Si la imagen es muy grande, la achicamos para no saturar los 512MB de RAM de Render
+        original.thumbnail((1200, 1200))
     except UnidentifiedImageError:
         raise HTTPException(status_code=422, detail="El archivo no es una imagen válida o está corrupto.")
     except Exception:
