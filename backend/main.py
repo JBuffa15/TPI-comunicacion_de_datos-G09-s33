@@ -101,11 +101,18 @@ async def procesar_imagen(
 
     # 4. Intentar abrir la imagen (detecta archivos corruptos)
     try:
-        original = Image.open(io.BytesIO(data)).convert("RGB")
-        original.verify()  # verifica integridad
-        original = Image.open(io.BytesIO(data)).convert("RGB")  # reabrir tras verify
-        # OPTIMIZACIÓN: Si la imagen es muy grande, la achicamos para no saturar los 512MB de RAM de Render
+        img_lazy = Image.open(io.BytesIO(data))
+        img_lazy.verify()  # verifica integridad
+        
+        # Reabrir tras verify
+        original = Image.open(io.BytesIO(data))
+        
+        # OPTIMIZACIÓN: Achicar la imagen ANTES de convertir a RGB para no explotar la memoria
         original.thumbnail((1200, 1200))
+        
+        # Ahora que es chiquita, la pasamos a RGB
+        original = original.convert("RGB")
+        
     except UnidentifiedImageError:
         raise HTTPException(status_code=422, detail="El archivo no es una imagen válida o está corrupto.")
     except Exception:
