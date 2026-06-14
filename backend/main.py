@@ -58,7 +58,7 @@ def compute_psnr(orig: Image.Image, proc: Image.Image) -> float:
     mse = np.mean((a - b) ** 2)
     if mse == 0:
         return 100.0
-    return round(20 * np.log10(255.0 / np.sqrt(mse)), 2)
+    return float(round(20 * np.log10(255.0 / np.sqrt(mse)), 2))
 
 def get_file_size_kb(img: Image.Image, fmt="PNG") -> float:
     buf = io.BytesIO()
